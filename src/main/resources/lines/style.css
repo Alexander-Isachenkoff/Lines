@@ -5,3 +5,39 @@
     -fx-pref-width: 80;
     -fx-pref-height: 80;
 }
+
+.hud-label .text {
+    -fx-font-smoothing-type: GRAY;
+}
+
+.hud-label .text {
+    -fx-font-size: 20;
+    -fx-font-weight: bold;
+    -fx-font-family: "Comic Sans MS";
+}
+
+.button {
+    -fx-background-insets: 0;
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-border-color: LIGHTGRAY;
+    -fx-border-width: 1 1 0 1;
+    -fx-border-radius: 8;
+    -fx-padding: 0;
+    -fx-cursor: HAND;
+    -fx-effect: dropshadow(three-pass-box, #AAA, 0, 0, 0, 5);
+}
+
+.button .text {
+    -fx-font-smoothing-type: GRAY;
+}
+
+.button:hover {
+    -fx-background-color: LIGHTGRAY;
+}
+
+.button:pressed {
+    -fx-effect: none;
+    -fx-translate-y: 5;
+    -fx-border-width: 1;
+}

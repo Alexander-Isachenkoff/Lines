@@ -1,5 +1,9 @@
 package lines.model;
 
+import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleIntegerProperty;
+
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -11,6 +15,10 @@ public class GameModel {
     private final Set<Ball> balls = new HashSet<>();
     private final Set<Ball> nextBalls = new HashSet<>();
     private final Random random = new Random();
+    private final SimpleIntegerProperty scoreProperty = new SimpleIntegerProperty(-1);
+    private final SimpleIntegerProperty recordProperty = new SimpleIntegerProperty(-1);
+    private final ReadOnlyStringWrapper textScoreProperty = new ReadOnlyStringWrapper();
+    private final ReadOnlyStringWrapper textRecordProperty = new ReadOnlyStringWrapper();
     private Consumer<Ball> onBallAdded = number -> {
     };
     private Consumer<Ball> onBallRemoved = number -> {
@@ -21,6 +29,25 @@ public class GameModel {
     };
     private Consumer<Ball> onBallMoved = number -> {
     };
+    private Consumer<Integer> onNewRecord = value -> {
+    };
+
+    public GameModel() {
+        scoreProperty.addListener((observable, oldValue, newValue) -> {
+            if (newValue.intValue() > recordProperty.get()) {
+                recordProperty.set(newValue.intValue());
+            }
+        });
+        recordProperty.addListener((observable, oldValue, newValue) -> {
+            onNewRecord.accept(newValue.intValue());
+        });
+        scoreProperty.addListener((observable, oldValue, newValue) -> {
+            textScoreProperty.set(String.valueOf(newValue));
+        });
+        recordProperty.addListener((observable, oldValue, newValue) -> {
+            textRecordProperty.set(String.valueOf(newValue));
+        });
+    }
 
     private Ball generateBall() {
         int col;
@@ -34,6 +61,9 @@ public class GameModel {
     }
 
     public void restart() {
+        scoreProperty.set(0);
+        nextBalls.forEach(onNextBallRemoved);
+        nextBalls.clear();
         removeAllBalls();
         for (int i = 0; i <= START_BALLS; i++) {
             addBall(generateBall());
@@ -122,6 +152,7 @@ public class GameModel {
         for (Ball ball : ballsToRemove) {
             removeBall(ball);
         }
+        addScore(ballsToRemove.size());
     }
 
     private Set<Ball> findHLine(int col, int row) {
@@ -166,6 +197,26 @@ public class GameModel {
             break;
         }
         return (lineBalls.size() >= MIN_LINE_LENGTH) ? lineBalls : Collections.emptySet();
+    }
+
+    private void addScore(int score) {
+        scoreProperty.set(scoreProperty.get() + score);
+    }
+
+    public ReadOnlyStringProperty textScoreProperty() {
+        return textScoreProperty.getReadOnlyProperty();
+    }
+
+    public ReadOnlyStringProperty textRecordProperty() {
+        return textRecordProperty.getReadOnlyProperty();
+    }
+
+    public void setRecord(int record) {
+        recordProperty.set(record);
+    }
+
+    public void setOnNewRecord(Consumer<Integer> onNewRecord) {
+        this.onNewRecord = onNewRecord;
     }
 
 }
