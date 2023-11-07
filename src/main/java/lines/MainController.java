@@ -4,7 +4,6 @@ import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
@@ -31,17 +30,7 @@ public class MainController {
     @FXML
     private Pane gamePane;
 
-    private final SingleSelectionModel<BallTile> selectionModel = new SingleSelectionModel<BallTile>() {
-        @Override
-        protected BallTile getModelItem(int index) {
-            return getBallTiles().get(index);
-        }
-
-        @Override
-        protected int getItemCount() {
-            return getBallTiles().size();
-        }
-    };
+    private BallTile selectedTile;
 
     @FXML
     private void initialize() {
@@ -51,9 +40,8 @@ public class MainController {
         gamePane.setOnMouseClicked(event -> {
             int col = (int) Math.floor(event.getX() / GRID_SIZE);
             int row = (int) Math.floor(event.getY() / GRID_SIZE);
-            BallTile selectedItem = selectionModel.getSelectedItem();
-            if (selectedItem != null) {
-                Ball ball = selectedItem.getBall();
+            if (selectedTile != null) {
+                Ball ball = selectedTile.getBall();
                 if (ball.getCol() != col || ball.getRow() != row) {
                     gameModel.move(ball, col, row);
                 }
@@ -63,7 +51,7 @@ public class MainController {
         gameModel.setOnBallAdded(this::onBallAdded);
 
         gameModel.setOnBallMoved(ball -> {
-            selectionModel.select(null);
+            select(null);
             BallTile ballTile = getBallTile(ball);
             final int xDest = ball.getCol() * GRID_SIZE;
             final int yDest = ball.getRow() * GRID_SIZE;
@@ -80,15 +68,6 @@ public class MainController {
         gameModel.setOnNextBallRemoved(ball -> {
             BallTile tile = getBallTile(ball);
             gamePane.getChildren().remove(tile);
-        });
-
-        selectionModel.selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (oldValue != null) {
-                oldValue.stopJump();
-            }
-            if (newValue != null) {
-                newValue.jump();
-            }
         });
 
         gameModel.setOnNewRecord(value -> {
@@ -113,16 +92,26 @@ public class MainController {
         gameModel.restart();
     }
 
+    private void select(BallTile ballTile) {
+        if (selectedTile != null) {
+            selectedTile.stopJump();
+        }
+        if (ballTile != null) {
+            ballTile.jump();
+        }
+        selectedTile = ballTile;
+    }
+
     private void onBallAdded(Ball ball) {
         BallTile tile = new BallTile(ball);
         tile.setPrefSize(GRID_SIZE, GRID_SIZE);
         tile.setTranslateX(ball.getCol() * GRID_SIZE);
         tile.setTranslateY(ball.getRow() * GRID_SIZE);
         tile.setOnMouseClicked(event -> {
-            if (selectionModel.getSelectedItem() == tile) {
-                selectionModel.select(null);
+            if (selectedTile == tile) {
+                select(null);
             } else {
-                selectionModel.select(tile);
+                select(tile);
             }
         });
         tile.setOnMouseEntered(event -> {
