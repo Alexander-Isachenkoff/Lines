@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class MainController {
 
-    public static final int GRID_SIZE = 80;
+    private static final int GRID_SIZE = 80;
     private final GameModel gameModel = new GameModel();
     @FXML
     private Pane gamePane;
@@ -64,6 +64,12 @@ public class MainController {
             tile.setOnMouseExited(event -> {
                 tile.setEffect(null);
             });
+            ScaleTransition tt = new ScaleTransition(new Duration(200), tile);
+            tt.setFromX(0.25);
+            tt.setFromY(0.25);
+            tt.setToX(1);
+            tt.setToY(1);
+            tt.play();
             gamePane.getChildren().add(tile);
         });
 
@@ -89,6 +95,21 @@ public class MainController {
             tt.play();
         });
 
+        gameModel.setOnNextBallAdded(ball -> {
+            BallTile tile = new BallTile(ball);
+            tile.setPrefSize(GRID_SIZE, GRID_SIZE);
+            tile.setTranslateX(ball.getCol() * GRID_SIZE);
+            tile.setTranslateY(ball.getRow() * GRID_SIZE);
+            tile.setScaleX(0.25);
+            tile.setScaleY(0.25);
+            gamePane.getChildren().add(tile);
+        });
+
+        gameModel.setOnNextBallRemoved(ball -> {
+            BallTile tile = getBallTile(ball);
+            gamePane.getChildren().remove(tile);
+        });
+
         selectionModel.selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue != null) {
                 oldValue.stopJump();
@@ -97,11 +118,8 @@ public class MainController {
                 newValue.jump();
             }
         });
-    }
 
-    @FXML
-    private void onNext() {
-        gameModel.generateBall();
+        gameModel.restart();
     }
 
     private List<BallTile> getBallTiles() {

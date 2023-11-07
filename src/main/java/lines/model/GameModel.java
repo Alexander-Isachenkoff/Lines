@@ -7,16 +7,22 @@ public class GameModel {
     private static final int GRID_SIZE = 8;
     private static final int MIN_LINE_LENGTH = 5;
     private static final int BALLS_FOR_TURN = 3;
+    private static final int START_BALLS = 5;
     private final Set<Ball> balls = new HashSet<>();
+    private final Set<Ball> nextBalls = new HashSet<>();
     private final Random random = new Random();
     private Consumer<Ball> onBallAdded = number -> {
     };
     private Consumer<Ball> onBallRemoved = number -> {
     };
+    private Consumer<Ball> onNextBallAdded = number -> {
+    };
+    private Consumer<Ball> onNextBallRemoved = number -> {
+    };
     private Consumer<Ball> onBallMoved = number -> {
     };
 
-    public void generateBall() {
+    private void generateBall() {
         int col;
         int row;
         do {
@@ -25,7 +31,31 @@ public class GameModel {
         } while (get(col, row).isPresent());
         BallColor color = BallColor.values()[random.nextInt(BallColor.values().length)];
         Ball ball = new Ball(col, row, color);
-        addBall(ball);
+        nextBalls.add(ball);
+    }
+
+    public void restart() {
+        removeAllBalls();
+        for (int i = 0; i <= START_BALLS; i++) {
+            generateBall();
+        }
+        spawnBalls();
+        generateNextBalls();
+    }
+
+    private void generateNextBalls() {
+        for (int i = 0; i < BALLS_FOR_TURN; i++) {
+            generateBall();
+        }
+        nextBalls.forEach(onNextBallAdded);
+    }
+
+    private void spawnBalls() {
+        nextBalls.forEach(onNextBallRemoved);
+        for (Ball nextBall : nextBalls) {
+            addBall(nextBall);
+        }
+        nextBalls.clear();
     }
 
     private Optional<Ball> get(int col, int row) {
@@ -46,6 +76,10 @@ public class GameModel {
         onBallRemoved.accept(ball);
     }
 
+    private void removeAllBalls() {
+        new HashSet<>(balls).forEach(this::removeBall);
+    }
+
     public void setOnBallAdded(Consumer<Ball> onBallAdded) {
         this.onBallAdded = onBallAdded;
     }
@@ -58,14 +92,21 @@ public class GameModel {
         this.onBallMoved = onBallMoved;
     }
 
+    public void setOnNextBallAdded(Consumer<Ball> onNextBallAdded) {
+        this.onNextBallAdded = onNextBallAdded;
+    }
+
+    public void setOnNextBallRemoved(Consumer<Ball> onNextBallRemoved) {
+        this.onNextBallRemoved = onNextBallRemoved;
+    }
+
     public void move(Ball ball, int col, int row) {
         ball.setCol(col);
         ball.setRow(row);
         onBallMoved.accept(ball);
         removeLines();
-        for (int i = 0; i < BALLS_FOR_TURN; i++) {
-            generateBall();
-        }
+        spawnBalls();
+        generateNextBalls();
     }
 
     private void removeLines() {
