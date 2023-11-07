@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class GameModel {
     private static final int GRID_SIZE = 8;
@@ -31,6 +32,8 @@ public class GameModel {
     };
     private Consumer<Integer> onNewRecord = value -> {
     };
+    private Runnable onGameOver = () -> {
+    };
 
     public GameModel() {
         scoreProperty.addListener((observable, oldValue, newValue) -> {
@@ -50,14 +53,16 @@ public class GameModel {
     }
 
     private Ball generateBall() {
-        int col;
-        int row;
-        do {
-            col = random.nextInt(GRID_SIZE);
-            row = random.nextInt(GRID_SIZE);
-        } while (get(col, row).isPresent());
+        List<Place> places = getEmptyPlacesNoNext();
+        Place place = places.get(random.nextInt(places.size()));
         BallColor color = BallColor.values()[random.nextInt(BallColor.values().length)];
-        return new Ball(col, row, color);
+        return new Ball(place.col, place.row, color);
+    }
+
+    private List<Place> getEmptyPlacesNoNext() {
+        return getEmptyPlaces().stream()
+                .filter(place -> nextBalls.stream().noneMatch(ball -> ball.getCol() == place.col && ball.getRow() == place.row))
+                .collect(Collectors.toList());
     }
 
     public void restart() {
@@ -72,7 +77,8 @@ public class GameModel {
     }
 
     private void generateNextBalls() {
-        for (int i = 0; i < BALLS_FOR_TURN; i++) {
+        int nextCount = Math.min(BALLS_FOR_TURN, getEmptyPlaces().size());
+        for (int i = 0; i < nextCount; i++) {
             nextBalls.add(generateBall());
         }
         nextBalls.forEach(onNextBallAdded);
@@ -132,6 +138,10 @@ public class GameModel {
         this.onNextBallRemoved = onNextBallRemoved;
     }
 
+    public void setOnGameOver(Runnable onGameOver) {
+        this.onGameOver = onGameOver;
+    }
+
     public void move(Ball ball, int col, int row) {
         ball.setCol(col);
         ball.setRow(row);
@@ -139,19 +149,19 @@ public class GameModel {
         removeLines();
         spawnBalls();
         generateNextBalls();
+        if (getEmptyPlaces().isEmpty()) {
+            onGameOver.run();
+        }
     }
 
     public boolean canMove(Ball ball, int colTo, int rowTo) {
         Graph<Place> graph = new Graph<>();
-        for (int col = 0; col < GRID_SIZE; col++) {
-            for (int row = 0; row < GRID_SIZE; row++) {
-                if (!get(col, row).isPresent()) {
-                    Place place = new Place(col, row);
-                    graph.getElements().add(place);
-                    graph.getRelations().put(place, neighboursPlaces(col, row));
-                }
-            }
+        Set<Place> places = getEmptyPlaces();
+        graph.getElements().addAll(places);
+        for (Place place : places) {
+            graph.getRelations().put(place, neighboursPlaces(place.col, place.row));
         }
+
         Place from = new Place(ball.getCol(), ball.getRow());
         graph.getElements().add(from);
         graph.getRelations().put(from, neighboursPlaces(ball.getCol(), ball.getRow()));
@@ -167,6 +177,18 @@ public class GameModel {
         } else {
             return false;
         }
+    }
+
+    private Set<Place> getEmptyPlaces() {
+        Set<Place> places = new HashSet<>();
+        for (int col = 0; col < GRID_SIZE; col++) {
+            for (int row = 0; row < GRID_SIZE; row++) {
+                if (!get(col, row).isPresent()) {
+                    places.add(new Place(col, row));
+                }
+            }
+        }
+        return places;
     }
 
     private Set<Place> neighboursPlaces(int col, int row) {

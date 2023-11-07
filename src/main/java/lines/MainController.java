@@ -4,6 +4,7 @@ import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.layout.Pane;
@@ -93,6 +94,14 @@ public class MainController {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        });
+
+        gameModel.setOnGameOver(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setHeaderText("Игра окончена");
+            alert.setContentText("Счёт: " + gameModel.textScoreProperty().get());
+            alert.showAndWait();
+            gameModel.restart();
         });
 
         int record = 0;
