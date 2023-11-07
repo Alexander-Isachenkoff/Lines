@@ -22,7 +22,7 @@ public class GameModel {
     private Consumer<Ball> onBallMoved = number -> {
     };
 
-    private void generateBall() {
+    private Ball generateBall() {
         int col;
         int row;
         do {
@@ -30,22 +30,20 @@ public class GameModel {
             row = random.nextInt(GRID_SIZE);
         } while (get(col, row).isPresent());
         BallColor color = BallColor.values()[random.nextInt(BallColor.values().length)];
-        Ball ball = new Ball(col, row, color);
-        nextBalls.add(ball);
+        return new Ball(col, row, color);
     }
 
     public void restart() {
         removeAllBalls();
         for (int i = 0; i <= START_BALLS; i++) {
-            generateBall();
+            addBall(generateBall());
         }
-        spawnBalls();
         generateNextBalls();
     }
 
     private void generateNextBalls() {
         for (int i = 0; i < BALLS_FOR_TURN; i++) {
-            generateBall();
+            nextBalls.add(generateBall());
         }
         nextBalls.forEach(onNextBallAdded);
     }
@@ -53,7 +51,11 @@ public class GameModel {
     private void spawnBalls() {
         nextBalls.forEach(onNextBallRemoved);
         for (Ball nextBall : nextBalls) {
-            addBall(nextBall);
+            if (get(nextBall.getCol(), nextBall.getRow()).isPresent()) {
+                addBall(generateBall());
+            } else {
+                addBall(nextBall);
+            }
         }
         nextBalls.clear();
     }
