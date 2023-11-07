@@ -21,6 +21,7 @@ public class Main extends Application {
         Scene scene = new Scene(parent);
         stage.setScene(scene);
         stage.setResizable(false);
+        stage.setTitle("Lines");
         stage.sizeToScene();
         stage.show();
     }

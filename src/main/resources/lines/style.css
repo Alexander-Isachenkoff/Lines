@@ -13,7 +13,6 @@
 
 .backtile:hover {
     -fx-background-color: LIGHTGRAY;
-    -fx-cursor: HAND;
 }
 
 .hud-label .text {

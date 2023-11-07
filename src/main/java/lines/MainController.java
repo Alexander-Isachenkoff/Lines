@@ -3,6 +3,7 @@ package lines;
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.control.Label;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.layout.Pane;
@@ -42,9 +43,26 @@ public class MainController {
             if (selectedTile != null) {
                 Ball ball = selectedTile.getBall();
                 if (ball.getCol() != col || ball.getRow() != row) {
-                    gameModel.move(ball, col, row);
+                    if (gameModel.canMove(ball, col, row)) {
+                        gameModel.move(ball, col, row);
+                    }
                 }
             }
+        });
+
+        gamePane.setOnMouseMoved(event -> {
+            int col = (int) Math.floor(event.getX() / GameProperties.GRID_SIZE);
+            int row = (int) Math.floor(event.getY() / GameProperties.GRID_SIZE);
+            Cursor cursor = Cursor.DEFAULT;
+            if (selectedTile != null) {
+                Ball ball = selectedTile.getBall();
+                if (ball.getCol() != col || ball.getRow() != row) {
+                    if (gameModel.canMove(ball, col, row)) {
+                        cursor = Cursor.CROSSHAIR;
+                    }
+                }
+            }
+            gamePane.setCursor(cursor);
         });
 
         gameModel.setOnBallAdded(this::onBallAdded);

@@ -65,7 +65,7 @@ public class GameModel {
         nextBalls.forEach(onNextBallRemoved);
         nextBalls.clear();
         removeAllBalls();
-        for (int i = 0; i <= START_BALLS; i++) {
+        for (int i = 0; i < START_BALLS; i++) {
             addBall(generateBall());
         }
         generateNextBalls();
@@ -139,6 +139,59 @@ public class GameModel {
         removeLines();
         spawnBalls();
         generateNextBalls();
+    }
+
+    public boolean canMove(Ball ball, int colTo, int rowTo) {
+        Graph<Place> graph = new Graph<>();
+        for (int col = 0; col < GRID_SIZE; col++) {
+            for (int row = 0; row < GRID_SIZE; row++) {
+                if (!get(col, row).isPresent()) {
+                    Place place = new Place(col, row);
+                    graph.getElements().add(place);
+                    graph.getRelations().put(place, neighboursPlaces(col, row));
+                }
+            }
+        }
+        Place from = new Place(ball.getCol(), ball.getRow());
+        graph.getElements().add(from);
+        graph.getRelations().put(from, neighboursPlaces(ball.getCol(), ball.getRow()));
+
+        Optional<Place> optionalPlace = graph.getElements().stream()
+                .filter(place -> place.col == colTo)
+                .filter(place -> place.row == rowTo)
+                .findFirst();
+
+        if (optionalPlace.isPresent()) {
+            Place to = optionalPlace.get();
+            return graph.hasPath(from, to);
+        } else {
+            return false;
+        }
+    }
+
+    private Set<Place> neighboursPlaces(int col, int row) {
+        Set<Place> neighbours = new HashSet<>();
+        if (col > 0) {
+            if (!get(col - 1, row).isPresent()) {
+                neighbours.add(new Place(col - 1, row));
+            }
+        }
+        if (col < GRID_SIZE - 1) {
+            if (!get(col + 1, row).isPresent()) {
+                neighbours.add(new Place(col + 1, row));
+            }
+        }
+        if (row > 0) {
+            if (!get(col, row - 1).isPresent()) {
+                neighbours.add(new Place(col, row - 1));
+            }
+        }
+        if (row < GRID_SIZE - 1) {
+            if (!get(col, row + 1).isPresent()) {
+                neighbours.add(new Place(col, row + 1));
+            }
+        }
+        return neighbours;
     }
 
     private void removeLines() {
@@ -217,6 +270,34 @@ public class GameModel {
 
     public void setOnNewRecord(Consumer<Integer> onNewRecord) {
         this.onNewRecord = onNewRecord;
+    }
+
+    private static class Place {
+        private final int col;
+        private final int row;
+
+        public Place(int col, int row) {
+            this.col = col;
+            this.row = row;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Place place = (Place) o;
+
+            if (col != place.col) return false;
+            return row == place.row;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = col;
+            result = 31 * result + row;
+            return result;
+        }
     }
 
 }
