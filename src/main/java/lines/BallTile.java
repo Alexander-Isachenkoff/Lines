@@ -4,6 +4,8 @@ import javafx.animation.ParallelTransition;
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.geometry.Pos;
+import javafx.scene.effect.Light;
+import javafx.scene.effect.Lighting;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
@@ -18,6 +20,9 @@ public class BallTile extends StackPane {
         this.ball = ball;
         setAlignment(Pos.CENTER);
         circle = new Circle(GameProperties.GRID_SIZE * 0.3, ball.getColor().getColor());
+        Light.Distant light = new Light.Distant();
+        light.setAzimuth(240);
+        circle.setEffect(new Lighting(light));
         getChildren().add(circle);
         getStyleClass().add("ball-tile");
     }
