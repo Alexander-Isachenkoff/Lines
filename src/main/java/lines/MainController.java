@@ -34,7 +34,7 @@ public class MainController {
     private final SingleSelectionModel<BallTile> selectionModel = new SingleSelectionModel<BallTile>() {
         @Override
         protected BallTile getModelItem(int index) {
-            return getBallTiles().get(0);
+            return getBallTiles().get(index);
         }
 
         @Override
