@@ -1,9 +1,19 @@
+.ball-tile {
+    -fx-cursor: HAND;
+}
+
 .backtile {
-    -fx-background-color: WHITE;
-    -fx-background-radius: 8;
-    -fx-background-insets: 3;
-    -fx-pref-width: 80;
-    -fx-pref-height: 80;
+    -fx-background-color: #ddd;
+    -fx-background-insets: -1 -1 0 0;
+    -fx-border-insets: -1 -1 0 0;
+    -fx-border-color: GRAY;
+    -fx-pref-width: 60;
+    -fx-pref-height: 60;
+}
+
+.backtile:hover {
+    -fx-background-color: LIGHTGRAY;
+    -fx-cursor: HAND;
 }
 
 .hud-label .text {

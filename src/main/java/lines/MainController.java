@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 public class MainController {
 
     private static final String RECORD_FILE = "record.txt";
-    private static final int GRID_SIZE = 80;
     private final GameModel gameModel = new GameModel();
     @FXML
     private Label scoreLabel;
@@ -38,8 +37,8 @@ public class MainController {
         recordLabel.textProperty().bind(gameModel.textRecordProperty());
 
         gamePane.setOnMouseClicked(event -> {
-            int col = (int) Math.floor(event.getX() / GRID_SIZE);
-            int row = (int) Math.floor(event.getY() / GRID_SIZE);
+            int col = (int) Math.floor(event.getX() / GameProperties.GRID_SIZE);
+            int row = (int) Math.floor(event.getY() / GameProperties.GRID_SIZE);
             if (selectedTile != null) {
                 Ball ball = selectedTile.getBall();
                 if (ball.getCol() != col || ball.getRow() != row) {
@@ -53,8 +52,8 @@ public class MainController {
         gameModel.setOnBallMoved(ball -> {
             select(null);
             BallTile ballTile = getBallTile(ball);
-            final int xDest = ball.getCol() * GRID_SIZE;
-            final int yDest = ball.getRow() * GRID_SIZE;
+            final int xDest = ball.getCol() * GameProperties.GRID_SIZE;
+            final int yDest = ball.getRow() * GameProperties.GRID_SIZE;
             TranslateTransition tt = new TranslateTransition(new Duration(100), ballTile);
             tt.setToX(xDest);
             tt.setToY(yDest);
@@ -104,9 +103,9 @@ public class MainController {
 
     private void onBallAdded(Ball ball) {
         BallTile tile = new BallTile(ball);
-        tile.setPrefSize(GRID_SIZE, GRID_SIZE);
-        tile.setTranslateX(ball.getCol() * GRID_SIZE);
-        tile.setTranslateY(ball.getRow() * GRID_SIZE);
+        tile.setPrefSize(GameProperties.GRID_SIZE, GameProperties.GRID_SIZE);
+        tile.setTranslateX(ball.getCol() * GameProperties.GRID_SIZE);
+        tile.setTranslateY(ball.getRow() * GameProperties.GRID_SIZE);
         tile.setOnMouseClicked(event -> {
             if (selectedTile == tile) {
                 select(null);
@@ -156,9 +155,9 @@ public class MainController {
 
     private void onNextBallAdded(Ball ball) {
         BallTile tile = new BallTile(ball);
-        tile.setPrefSize(GRID_SIZE, GRID_SIZE);
-        tile.setTranslateX(ball.getCol() * GRID_SIZE);
-        tile.setTranslateY(ball.getRow() * GRID_SIZE);
+        tile.setPrefSize(GameProperties.GRID_SIZE, GameProperties.GRID_SIZE);
+        tile.setTranslateX(ball.getCol() * GameProperties.GRID_SIZE);
+        tile.setTranslateY(ball.getRow() * GameProperties.GRID_SIZE);
         tile.setScaleX(0.25);
         tile.setScaleY(0.25);
         gamePane.getChildren().add(tile);

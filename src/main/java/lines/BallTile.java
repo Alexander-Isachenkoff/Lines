@@ -17,7 +17,7 @@ public class BallTile extends StackPane {
     public BallTile(Ball ball) {
         this.ball = ball;
         setAlignment(Pos.CENTER);
-        circle = new Circle(24, ball.getColor().getColor());
+        circle = new Circle(GameProperties.GRID_SIZE * 0.3, ball.getColor().getColor());
         getChildren().add(circle);
         getStyleClass().add("ball-tile");
     }
@@ -28,7 +28,7 @@ public class BallTile extends StackPane {
 
     public void jump() {
         TranslateTransition tt = new TranslateTransition(new Duration(400), circle);
-        tt.setToY(-15);
+        tt.setToY(-0.2 * GameProperties.GRID_SIZE);
 
         ScaleTransition st = new ScaleTransition(new Duration(400), circle);
         double factor = 0.05;
