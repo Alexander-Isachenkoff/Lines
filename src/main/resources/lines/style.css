@@ -1,0 +1,7 @@
+.backtile {
+    -fx-background-color: WHITE;
+    -fx-background-radius: 8;
+    -fx-background-insets: 3;
+    -fx-pref-width: 80;
+    -fx-pref-height: 80;
+}
