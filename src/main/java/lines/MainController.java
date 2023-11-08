@@ -8,6 +8,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.TilePane;
 import javafx.util.Duration;
 import lines.model.Ball;
 import lines.model.GameModel;
@@ -25,16 +26,39 @@ public class MainController {
     private static final String RECORD_FILE = "record.txt";
     private final GameModel gameModel = new GameModel();
     @FXML
+    private TilePane tilePane;
+    @FXML
     private Label scoreLabel;
     @FXML
     private Label recordLabel;
     @FXML
     private Pane gamePane;
-
     private BallTile selectedTile;
 
     @FXML
     private void initialize() {
+        for (int row = 0; row < GameModel.GRID_SIZE; row++) {
+            for (int col = 0; col < GameModel.GRID_SIZE; col++) {
+                BackTile backTile = new BackTile(col, row);
+                tilePane.getChildren().add(backTile);
+
+                backTile.setOnMouseEntered(event -> {
+                    if (selectedTile != null) {
+                        Ball ball = selectedTile.getBall();
+                        boolean canMove = gameModel.canMove(ball, backTile.getCol(), backTile.getRow());
+                        backTile.setCrossVisible(!canMove);
+                        backTile.setPlusVisible(canMove);
+                        backTile.setCursor(canMove ? Cursor.HAND : Cursor.DEFAULT);
+                    }
+                });
+
+                backTile.setOnMouseExited(event -> {
+                    backTile.setCrossVisible(false);
+                    backTile.setPlusVisible(false);
+                });
+            }
+        }
+
         scoreLabel.textProperty().bind(gameModel.textScoreProperty());
         recordLabel.textProperty().bind(gameModel.textRecordProperty());
 
@@ -49,21 +73,6 @@ public class MainController {
                     }
                 }
             }
-        });
-
-        gamePane.setOnMouseMoved(event -> {
-            int col = (int) Math.floor(event.getX() / GameProperties.GRID_SIZE);
-            int row = (int) Math.floor(event.getY() / GameProperties.GRID_SIZE);
-            Cursor cursor = Cursor.DEFAULT;
-            if (selectedTile != null) {
-                Ball ball = selectedTile.getBall();
-                if (ball.getCol() != col || ball.getRow() != row) {
-                    if (gameModel.canMove(ball, col, row)) {
-                        cursor = Cursor.CROSSHAIR;
-                    }
-                }
-            }
-            gamePane.setCursor(cursor);
         });
 
         gameModel.setOnBallAdded(this::onBallAdded);

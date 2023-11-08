@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class GameModel {
-    private static final int GRID_SIZE = 8;
+    public static final int GRID_SIZE = 8;
     private static final int MIN_LINE_LENGTH = 5;
     private static final int BALLS_FOR_TURN = 3;
     private static final int START_BALLS = 5;

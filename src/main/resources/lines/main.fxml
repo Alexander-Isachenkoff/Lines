@@ -59,73 +59,7 @@
          <children>
             <Pane fx:id="gamePane">
                <children>
-                  <TilePane prefColumns="8" prefRows="8">
-                     <children>
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                        <Label styleClass="backtile" />
-                     </children>
+                  <TilePane fx:id="tilePane" prefColumns="8" prefRows="8">
                   </TilePane>
                </children>
             </Pane>
