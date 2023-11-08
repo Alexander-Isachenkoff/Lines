@@ -76,26 +76,11 @@ public class MainController {
         });
 
         gameModel.setOnBallAdded(this::onBallAdded);
-
-        gameModel.setOnBallMoved(ball -> {
-            select(null);
-            BallTile ballTile = getBallTile(ball);
-            final int xDest = ball.getCol() * GameProperties.GRID_SIZE;
-            final int yDest = ball.getRow() * GameProperties.GRID_SIZE;
-            TranslateTransition tt = new TranslateTransition(new Duration(100), ballTile);
-            tt.setToX(xDest);
-            tt.setToY(yDest);
-            tt.play();
-        });
-
+        gameModel.setOnBallMoved(this::onBallMoved);
         gameModel.setOnBallRemoved(this::onBallRemoved);
-
         gameModel.setOnNextBallAdded(this::onNextBallAdded);
-
-        gameModel.setOnNextBallRemoved(ball -> {
-            BallTile tile = getBallTile(ball);
-            gamePane.getChildren().remove(tile);
-        });
+        gameModel.setOnNextBallRemoved(this::onNextBallRemoved);
+        gameModel.setOnGameOver(this::onGameOver);
 
         gameModel.setOnNewRecord(value -> {
             try {
@@ -105,14 +90,11 @@ public class MainController {
             }
         });
 
-        gameModel.setOnGameOver(() -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setHeaderText("Игра окончена");
-            alert.setContentText("Счёт: " + gameModel.textScoreProperty().get());
-            alert.showAndWait();
-            gameModel.restart();
-        });
+        gameModel.setRecord(loadRecord());
+        gameModel.restart();
+    }
 
+    private static int loadRecord() {
         int record = 0;
         try {
             Path path = Paths.get(RECORD_FILE);
@@ -122,8 +104,30 @@ public class MainController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        gameModel.setRecord(record);
+        return record;
+    }
 
+    private void onNextBallRemoved(Ball ball) {
+        BallTile tile = getBallTile(ball);
+        gamePane.getChildren().remove(tile);
+    }
+
+    private void onBallMoved(Ball ball) {
+        select(null);
+        BallTile ballTile = getBallTile(ball);
+        final int xDest = ball.getCol() * GameProperties.GRID_SIZE;
+        final int yDest = ball.getRow() * GameProperties.GRID_SIZE;
+        TranslateTransition tt = new TranslateTransition(new Duration(100), ballTile);
+        tt.setToX(xDest);
+        tt.setToY(yDest);
+        tt.play();
+    }
+
+    private void onGameOver() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText("Игра окончена");
+        alert.setContentText("Счёт: " + gameModel.textScoreProperty().get());
+        alert.showAndWait();
         gameModel.restart();
     }
 
