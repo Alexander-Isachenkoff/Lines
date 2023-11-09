@@ -2,4 +2,4 @@ target/
 *.iml
 .idea/
 /out/
-/record.txt
+/record

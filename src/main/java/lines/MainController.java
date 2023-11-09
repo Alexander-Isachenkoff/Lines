@@ -13,17 +13,17 @@ import javafx.util.Duration;
 import lines.model.Ball;
 import lines.model.GameModel;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class MainController {
 
-    private static final String RECORD_FILE = "record.txt";
+    private static final String RECORD_FILE = "record";
     private final GameModel gameModel = new GameModel();
     @FXML
     private TilePane tilePane;
@@ -34,6 +34,22 @@ public class MainController {
     @FXML
     private Pane gamePane;
     private BallTile selectedTile;
+
+    private static void saveRecord(int value) {
+        try (DataOutputStream os = new DataOutputStream(Files.newOutputStream(Paths.get(RECORD_FILE)))) {
+            os.writeInt(value);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static int loadRecord() {
+        try (DataInputStream inputStream = new DataInputStream(Files.newInputStream(Paths.get(RECORD_FILE)))) {
+            return inputStream.readInt();
+        } catch (IOException e) {
+            return 0;
+        }
+    }
 
     @FXML
     private void initialize() {
@@ -81,30 +97,10 @@ public class MainController {
         gameModel.setOnNextBallAdded(this::onNextBallAdded);
         gameModel.setOnNextBallRemoved(this::onNextBallRemoved);
         gameModel.setOnGameOver(this::onGameOver);
-
-        gameModel.setOnNewRecord(value -> {
-            try {
-                Files.write(Paths.get(RECORD_FILE), Collections.singletonList(String.valueOf(value)));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        gameModel.setOnNewRecord(MainController::saveRecord);
 
         gameModel.setRecord(loadRecord());
         gameModel.restart();
-    }
-
-    private static int loadRecord() {
-        int record = 0;
-        try {
-            Path path = Paths.get(RECORD_FILE);
-            if (Files.exists(path)) {
-                record = Integer.parseInt(Files.readAllLines(path).get(0));
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return record;
     }
 
     private void onNextBallRemoved(Ball ball) {
